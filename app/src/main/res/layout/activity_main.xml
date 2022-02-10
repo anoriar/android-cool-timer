@@ -7,6 +7,16 @@
     android:background="#007A6B"
     tools:context=".MainActivity">
 
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:thumbTint="#EF0606"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
@@ -17,17 +27,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/bell" />
 
-    <SeekBar
-        android:id="@+id/seekBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="61dp"
-        android:thumbTint="#EF0606"
-        app:layout_constraintBottom_toTopOf="@+id/imageView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+
 
 
     <TextView
@@ -45,6 +45,7 @@
 
     <Button
         android:id="@+id/button"
+        android:onClick="startTimerAction"
         android:layout_width="80dp"
         android:layout_height="50dp"
         android:layout_marginTop="12dp"
