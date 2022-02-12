@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -12,13 +11,13 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final long MAX_MILLIS_LEFT = 10000;
+    public static final int SECONDS_LEFT = 120;
     SeekBar seekbar;
     CountDownTimer timer;
     TextView timerText;
     Button timerButton;
     boolean isTimerStarted;
-    private long millisLeft = MAX_MILLIS_LEFT;
+    private int secondsLeft = SECONDS_LEFT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,22 +32,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void timerStart(){
-        timer = new CountDownTimer(millisLeft, 1000) {
+        timer = new CountDownTimer((long) secondsLeft * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                MainActivity.this.millisLeft = millisUntilFinished;
-                int secondsUntilFinished = (int) millisUntilFinished / 1000;
-                int minutes = (int) secondsUntilFinished / 60;
-                int seconds = secondsUntilFinished % 60;
-                timerText.setText(String.valueOf(minutes) + ":" + String.valueOf(seconds));
-                int test = 100 - (int)((float)MainActivity.this.millisLeft / (float)MAX_MILLIS_LEFT * 100);
-                Log.d("progress", String.valueOf(test));
-                seekbar.setProgress(test);
+                MainActivity.this.secondsLeft = (int) millisUntilFinished / 1000;
+                int minutes = (int) MainActivity.this.secondsLeft / 60;
+                int seconds = MainActivity.this.secondsLeft % 60;
+                timerText.setText(String.format("%02d:%02d", minutes, seconds));
+                seekbar.setProgress((int)(MainActivity.this.secondsLeft));
             }
 
             @Override
             public void onFinish() {
-
+                isTimerStarted = false;
+                timerButton.setText("START");
             }
         }.start();
     }
@@ -59,10 +56,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void createSeekBar(){
        this.seekbar = findViewById(R.id.seekBar);
+       seekbar.setMax((int) SECONDS_LEFT);
        seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
            @Override
            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
+                if(fromUser){
+                    secondsLeft = progress;
+                    timerStop();
+                    timerStart();
+                }
            }
 
            @Override
@@ -83,6 +85,10 @@ public class MainActivity extends AppCompatActivity {
             timerButton.setText("STOP");
             isTimerStarted = true;
             seekbar.setEnabled(true);
+            if(secondsLeft == 0){
+                secondsLeft = SECONDS_LEFT;
+                timerStart();
+            }
         }else{
             this.timerStop();
             seekbar.setEnabled(false);
