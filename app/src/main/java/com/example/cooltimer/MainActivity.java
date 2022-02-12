@@ -2,6 +2,7 @@ package com.example.cooltimer;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
@@ -17,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
     TextView timerText;
     Button timerButton;
     boolean isTimerStarted;
-    private int secondsLeft = SECONDS_LEFT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,67 +31,75 @@ public class MainActivity extends AppCompatActivity {
         this.createSeekBar();
     }
 
-    private void timerStart(){
-        timer = new CountDownTimer((long) secondsLeft * 1000, 1000) {
+    private void timerStart(int seconds) {
+        timer = new CountDownTimer((long) seconds * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                MainActivity.this.secondsLeft = (int) millisUntilFinished / 1000;
-                int minutes = (int) MainActivity.this.secondsLeft / 60;
-                int seconds = MainActivity.this.secondsLeft % 60;
-                timerText.setText(String.format("%02d:%02d", minutes, seconds));
-                seekbar.setProgress((int)(MainActivity.this.secondsLeft));
+                int seconds = (int) millisUntilFinished / 1000;
+                setTimerText(seconds);
+                seekbar.setProgress((seconds));
             }
 
             @Override
             public void onFinish() {
                 isTimerStarted = false;
                 timerButton.setText("START");
+                MediaPlayer bellFinishedSound = MediaPlayer.create(getApplicationContext(), R.raw.bell_sound);
+                bellFinishedSound.start();
             }
         }.start();
     }
 
-    private void timerStop(){
+    private void timerStop() {
         this.timer.cancel();
     }
 
-    private void createSeekBar(){
-       this.seekbar = findViewById(R.id.seekBar);
-       seekbar.setMax((int) SECONDS_LEFT);
-       seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-           @Override
-           public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser){
-                    secondsLeft = progress;
-                    timerStop();
-                    timerStart();
+    private void createSeekBar() {
+        this.seekbar = findViewById(R.id.seekBar);
+        seekbar.setMax((int) SECONDS_LEFT);
+        seekbar.setProgress((int) SECONDS_LEFT);
+        seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    setTimerText(progress);
                 }
-           }
+            }
 
-           @Override
-           public void onStartTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
-           }
+            }
 
-           @Override
-           public void onStopTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
 
-           }
-       });
+            }
+        });
+    }
+
+    private void setTimerText(int secondsLeft) {
+        int minutes = (int) secondsLeft / 60;
+        int seconds = secondsLeft % 60;
+        timerText.setText(String.format("%02d:%02d", minutes, seconds));
     }
 
     public void startTimerAction(View view) {
-        if(!isTimerStarted){
-            this.timerStart();
+        if (!isTimerStarted) {
+            int seconds = this.seekbar.getProgress();
             timerButton.setText("STOP");
             isTimerStarted = true;
-            seekbar.setEnabled(true);
-            if(secondsLeft == 0){
-                secondsLeft = SECONDS_LEFT;
-                timerStart();
-            }
-        }else{
-            this.timerStop();
             seekbar.setEnabled(false);
+            if (seconds == 0) {
+                timerStop();
+                timerStart(SECONDS_LEFT);
+                seekbar.setProgress(SECONDS_LEFT);
+            } else{
+                this.timerStart(seconds);
+            }
+        } else {
+            this.timerStop();
+            seekbar.setEnabled(true);
             timerButton.setText("START");
             isTimerStarted = false;
         }
