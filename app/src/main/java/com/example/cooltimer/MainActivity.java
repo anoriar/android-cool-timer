@@ -1,10 +1,15 @@
 package com.example.cooltimer;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -94,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 timerStop();
                 timerStart(SECONDS_LEFT);
                 seekbar.setProgress(SECONDS_LEFT);
-            } else{
+            } else {
                 this.timerStart(seconds);
             }
         } else {
@@ -103,5 +108,28 @@ public class MainActivity extends AppCompatActivity {
             timerButton.setText("START");
             isTimerStarted = false;
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.timer_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent openSettingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(openSettingsIntent);
+                return true;
+            case R.id.action_about:
+                Intent openAboutIntent = new Intent(MainActivity.this, AboutActivity.class);
+                startActivity(openAboutIntent);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
